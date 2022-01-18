@@ -58,7 +58,24 @@ class SpotifyClient:
         r = requests.get('https://api.spotify.com/v1/search', params=params, headers=headers)
         return [self._to_song_model(track) for track in r.json()["tracks"]["items"]]
 
+    def get_song(self, uri):
+        self._refresh_access_token_if_needed()
+        headers = {
+            'Authorization': self._make_authorization_header()
+        }
+        params = {
+            'market': 'TW'
+        }
+        r = requests.get(f'https://api.spotify.com/v1/tracks/{self._extract_spotify_id(uri)}', params=params,
+                         headers=headers)
+        response_data = r.json()
+        return self._to_song_model(response_data)
+
     @staticmethod
     def _to_song_model(track_item):
         artist = [artist["name"] for artist in track_item["artist"]].join(", ")
         return Song(track_item["uri"], track_item["name"], artist, track_item["album"]["name"])
+
+    @staticmethod
+    def _extract_spotify_id(uri):
+        return uri..rsplit(':', 1)[-1]

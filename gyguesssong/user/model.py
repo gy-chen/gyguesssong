@@ -13,9 +13,9 @@ class UserStatusInRoom(Enum):
 
 
 User = namedtuple('User', "id name")
-UserStateInRoom = namedtuple('UserStateInRoom', 'status')
+UserStateInRoom = namedtuple('UserStateInRoom', 'status can_advance_room')
 
 
-def get_user_state_in_room(room):
+def get_user_state_in_room(room, user):
     # TODO
     pass
