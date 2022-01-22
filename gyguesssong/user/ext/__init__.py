@@ -8,14 +8,23 @@ from authlib.jose.util import extract_segment
 from gyguesssong.user.model import User
 
 
+def _get_authorization_header():
+    authorization_header = request.headers.get("Authorization")
+    if authorization_header:
+        return authorization_header
+    authorization_header = request.cookies.get("Authorization")
+    if authorization_header:
+        return authorization_header
+    return None
+
+
 def _get_current_user():
-    header_raw = request.headers.get("Authorization")
-    if not header_raw:
+    authorization_header = _get_authorization_header()
+    if not authorization_header:
         return None
-    token_raw = _extract_bearer_token(header_raw)
+    token_raw = _extract_bearer_token(authorization_header)
     token = _decode_bearer_token(token_raw)
-    user = User(token["id"], token["name"])
-    return user
+    return User(token["id"], token["name"])
 
 
 def _get_user_ext():
@@ -59,16 +68,28 @@ class UserExt:
         self._jwt_secret = app.config.get('USER_EXT_JWT_SECRET')
         app.extensions["user_ext"] = self
 
+        self._register_blueprint(app)
+
+    @staticmethod
+    def _register_blueprint(app):
+        from gyguesssong.user.ext.view import bp
+
+        app.register_blueprint(bp)
+
     def authorize_redirect(self, redirect_uri):
         return self._oauth.user_ext.authorize_redirect(redirect_uri)
 
     def authorize_jwt_token(self):
         r = self._oauth.user_ext.authorize_access_token()
-        payload = _decode_id_token(r['id_token'])
+        payload = _decode_id_token(r['id_token'].encode())
         return self._encode_jwt_token({
             "id": payload['sub'],
             "name": payload["name"]
         })
+
+    @staticmethod
+    def set_authorization_response(response, jwt_token):
+        response.set_cookie('Authorization', f'Bearer {jwt_token}')
 
     def _encode_jwt_token(self, raw):
         header = {'alg': 'HS256'}
@@ -85,7 +106,7 @@ class IDTokenDecodeError(Exception):
 def login_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        if current_user is None:
+        if current_user._get_current_object() is None:
             abort(403)
         return fn(*args, **kwargs)
 
