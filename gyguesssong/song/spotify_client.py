@@ -32,7 +32,7 @@ class SpotifyClient:
         response_data = r.json()
         self._access_token = response_data['access_token']
         self._access_token_type = response_data['token_type']
-        self._access_token_expire_time = datetime.now() + timedelta(seconds=response_data['3600'])
+        self._access_token_expire_time = datetime.now() + timedelta(seconds=response_data['expires_in'])
 
     def _is_access_token_expire(self):
         if self._access_token is None:
@@ -73,9 +73,9 @@ class SpotifyClient:
 
     @staticmethod
     def _to_song_model(track_item):
-        artist = [artist["name"] for artist in track_item["artist"]].join(", ")
+        artist = ', '.join(artist["name"] for artist in track_item["artists"])
         return Song(track_item["uri"], track_item["name"], artist, track_item["album"]["name"])
 
     @staticmethod
     def _extract_spotify_id(uri):
-        return uri..rsplit(':', 1)[-1]
+        return uri.rsplit(':', 1)[-1]
