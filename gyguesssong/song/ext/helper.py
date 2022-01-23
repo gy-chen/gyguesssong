@@ -1,3 +1,7 @@
 def make_song_json_view(song):
-    # TODO
-    pass
+    return {
+        'uri': song.uri,
+        'name': song.name,
+        'artist': song.artist,
+        'album': song.album
+    }

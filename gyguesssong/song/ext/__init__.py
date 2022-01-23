@@ -19,7 +19,16 @@ class SongExt:
         client_secret = app.config.get('SONG_EXT_CLIENT_SECRET')
 
         self._spotify_search_client = SpotifyClient(client_id, client_secret)
+
+        self._register_blueprint(app)
+
         app.extensions['song_ext'] = self
+
+    @staticmethod
+    def _register_blueprint(app):
+        from gyguesssong.song.ext.view import bp
+
+        app.register_blueprint(bp)
 
     @property
     def spotify_search_client(self):

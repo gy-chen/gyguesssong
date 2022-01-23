@@ -7,7 +7,7 @@ from gyguesssong.user.ext import login_required
 bp = Blueprint('song', __name__)
 
 
-@bp.route("/song/search/<term>/<page:int>")
+@bp.route("/song/search/<term>/<int:page>")
 @login_required
 def search_songs(term, page=0):
     songs = song_search_client.search(term, page)
