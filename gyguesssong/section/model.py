@@ -9,13 +9,23 @@ class SectionStatus(Enum):
     FINISHED = 4
 
 
-Section = namedtuple('Section', 'status correct_song correct_song_download_url candidate_songs votes scores')
+Section = namedtuple('Section', 'section_id status correct_song candidate_songs votes scores')
 Vote = namedtuple('Vote', 'vote_song_uri user')
 Score = namedtuple('Score', 'point user')
 
 
 def create_section(correct_song, candidate_songs):
-    # TODO:
+    return Section(
+        SectionStatus.PREPARING,
+        correct_song,
+        candidate_songs,
+        (),
+        ()
+    )
+
+
+def get_section(sections, section_id):
+    # TODO
     pass
 
 
