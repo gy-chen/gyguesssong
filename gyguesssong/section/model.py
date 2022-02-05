@@ -61,7 +61,7 @@ def vote(section, vote_song_uri, user):
 
 
 def _vote(section, vote_song_uri, user):
-    return _copy_section(section, votes=tuple(Vote(vote_song_uri, user), *section.votes))
+    return _copy_section(section, votes=section.votes + (Vote(vote_song_uri, user),))
 
 
 def section_status_is(section, status):
@@ -131,10 +131,10 @@ def calculate_scores(correct_song, votes):
 
 def _copy_section(section, status=None, correct_song=None, candidate_songs=None, votes=None, scores=None):
     return Section(
-        section.id,
+        section.section_id,
         section.status if status is None else status,
-        section.corrent_song if correct_song is None else correct_song,
+        section.correct_song if correct_song is None else correct_song,
         section.candidate_songs if candidate_songs is None else candidate_songs,
-        tuple(vote, *section.votes) if votes is None else votes,
+        section.votes if votes is None else votes,
         section.scores if scores is None else scores
     )
