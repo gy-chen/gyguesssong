@@ -104,9 +104,9 @@ INCORRECT_SCORE_LEVELS = (-4, -2, -1, -2, -4)
 
 
 def _create_scores_pool(data_len, score_levels, padding_score_index):
-    return score_levels[:padding_score_index] + \
-           score_levels[padding_score_index:padding_score_index + 1] * min(data_len - len(score_levels), 0) + \
-           score_levels[padding_score_index + 1:]
+    return list(score_levels[:padding_score_index] +
+                score_levels[padding_score_index:padding_score_index + 1] * max(data_len - len(score_levels) + 1, 1) +
+                score_levels[padding_score_index + 1:])
 
 
 def calculate_scores(correct_song, votes):
